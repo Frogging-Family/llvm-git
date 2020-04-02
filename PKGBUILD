@@ -21,7 +21,7 @@
 _nocheck="false"
 
 pkgname=('llvm-git' 'llvm-libs-git' 'llvm-ocaml-git' 'lib32-llvm-git' 'lib32-llvm-libs-git')
-pkgver=11.0.0_r346854.ef49895da89
+pkgver=11.0.0_r347063.192cccb1522
 pkgrel=1
 arch=('x86_64')
 url="https://llvm.org/"
@@ -31,15 +31,12 @@ makedepends=('git' 'cmake' 'ninja' 'libffi' 'libedit' 'ncurses' 'libxml2' 'pytho
              'swig' 'python' 'lib32-gcc-libs' 'lib32-libffi' 'lib32-libxml2' 'lib32-zlib')
 
 source=("llvm-project::git+https://github.com/llvm/llvm-project.git"
-              'llvm-config.h'
-              'enable-SSP-and-PIE-by-default.patch')
+              'llvm-config.h')
 
 md5sums=('SKIP'
-         '295c343dcd457dc534662f011d7cff1a'
-         '94e558db946aba91ce9789087a35ae1b')
+         '295c343dcd457dc534662f011d7cff1a')
 sha512sums=('SKIP'
-            '75e743dea28b280943b3cc7f8bbb871b57d110a7f2b9da2e6845c1c36bf170dd883fca54e463f5f49e0c3effe07fbd0db0f8cf5a12a2469d3f792af21a73fcdd'
-            '3fe75bfacdf7eabe18fefe3724fff1e8d8271870bd21374f7bba5949037648eb5b0a73e372545850190fca0d09a2bdc6eafaa86c68d34fb6dd00957f70da2b1c')
+            '75e743dea28b280943b3cc7f8bbb871b57d110a7f2b9da2e6845c1c36bf170dd883fca54e463f5f49e0c3effe07fbd0db0f8cf5a12a2469d3f792af21a73fcdd')
 options=('staticlibs' 'ccache')
 
 # NINJAFLAGS is an env var used to pass commandline options to ninja
@@ -49,11 +46,6 @@ _python_optimize() {
   python -m compileall "$@"
   python -O -m compileall "$@"
   python -OO -m compileall "$@"
-}
-
- _ocamlver() {
-    { pacman -Q ocaml 2>/dev/null || pacman -Sp --print-format '%n %v' ocaml ;} \
-     | awk '{ print $2 }' | cut -d - -f 1 | cut -d . -f 1,2,3
 }
     
 pkgver() {
@@ -85,7 +77,6 @@ prepare() {
     rm -rf debuginfo-tests libclc libcxx libcxxabi libunwind llgo openmp parallel-libs pstl libc
     
     cd clang
-    patch --forward --strip=1 --input="$srcdir"/enable-SSP-and-PIE-by-default.patch
 }
 
 build() {
@@ -105,7 +96,6 @@ build() {
         -D LLVM_BUILD_LLVM_DYLIB=ON \
         -D LLVM_LINK_LLVM_DYLIB=ON \
         -D LLVM_INSTALL_UTILS=ON \
-        -D LLVM_BUILD_TESTS=ON \
         -D LLVM_BUILD_DOCS=ON \
         -D LLVM_ENABLE_DOXYGEN=OFF \
         -D LLVM_ENABLE_SPHINX=ON \
@@ -262,7 +252,7 @@ package_llvm-libs-git() {
 
 package_llvm-ocaml-git() {
     pkgdesc="OCaml bindings for LLVM"
-    depends=("llvm-git=$pkgver-$pkgrel" "ocaml=$(_ocamlver)" 'ocaml-ctypes')
+    depends=("llvm-git=$pkgver-$pkgrel" "ocaml" 'ocaml-ctypes')
     conflicts=('llvm-ocaml')
     provides=("llvm-ocaml=$pkgver-$pkgrel")
     
