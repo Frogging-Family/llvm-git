@@ -80,6 +80,8 @@ prepare() {
 }
 
 build() {
+    export CFLAGS="$(echo "$CFLAGS" | sed -e "s/-fstack-protector-strong//")"
+    export CXXFLAGS="$(echo "$CXXFLAGS" | sed -e "s/-fstack-protector-strong//")"
 
     cd _build64
     cmake "$srcdir"/llvm-project/llvm  -G Ninja \
