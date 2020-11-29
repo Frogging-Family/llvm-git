@@ -74,7 +74,7 @@ prepare() {
     
     cd llvm-project
     # llvm-project contains a lot of stuff, remove parts that aren't used by this package
-    rm -rf debuginfo-tests libclc libcxx libcxxabi libunwind llgo openmp parallel-libs pstl libc
+    rm -rf debuginfo-tests libclc libcxx libcxxabi llgo openmp parallel-libs pstl libc
     
     cd clang
 }
