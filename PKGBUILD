@@ -21,7 +21,7 @@
 _nocheck="false"
 
 pkgname=('llvm-git' 'llvm-libs-git' 'llvm-ocaml-git' 'lib32-llvm-git' 'lib32-llvm-libs-git')
-pkgver=11.0.0_r355984.961c1b5f724
+pkgver=13.0.0_r394957.259e365deaa3
 pkgrel=1
 arch=('x86_64')
 url="https://llvm.org/"
@@ -30,7 +30,7 @@ makedepends=('git' 'cmake' 'ninja' 'libffi' 'libedit' 'ncurses' 'libxml2' 'pytho
              'ocaml' 'ocaml-ctypes' 'ocaml-findlib' 'python-sphinx' 'python-recommonmark'
              'swig' 'python' 'lib32-gcc-libs' 'lib32-libffi' 'lib32-libxml2' 'lib32-zlib')
 
-source=("llvm-project::git+https://github.com/llvm/llvm-project.git"
+source=("llvm-project::git+https://github.com/llvm/llvm-project.git#branch=main"
               'llvm-config.h')
 
 md5sums=('SKIP'
@@ -175,18 +175,15 @@ package_llvm-git() {
         DESTDIR="$pkgdir" ninja $NINJAFLAGS install
     popd
 
-    _py="3.8"
-    # Clean up conflicting files
-    # TODO: This should probably be discussed with upstream.
-    rm -rf "${pkgdir}/usr/lib/python$_py/site-packages/six.py"
-
     # Include lit for running lit-based tests in other projects
     pushd llvm-project/llvm/utils/lit
     python setup.py install --root="$pkgdir" -O1
     popd
-    
+
     # Move analyzer scripts out of /usr/libexec
     mv "$pkgdir"/usr/libexec/{ccc,c++}-analyzer "$pkgdir"/usr/lib/clang/
+    mv "$pkgdir"/usr/libexec/analyze-{cc,c++} "$pkgdir"/usr/lib/clang/
+    mv "$pkgdir"/usr/libexec/intercept-{cc,c++} "$pkgdir"/usr/lib/clang/
     rmdir "$pkgdir"/usr/libexec
     sed -i 's|libexec|lib/clang|' "$pkgdir"/usr/bin/scan-build
 
@@ -207,6 +204,7 @@ package_llvm-git() {
         cp "$srcdir"/llvm-config.h "$pkgdir"/usr/include/llvm/Config/llvm-config.h
     fi
 
+    _py="3.9"
     cd llvm-project
     # Install Python bindings and optimize them
     cp -a llvm/bindings/python/llvm  "$pkgdir"/usr/lib/python$_py/site-packages/
